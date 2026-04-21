@@ -15,89 +15,77 @@
 ## 框架图
 
 ```mermaid
-graph LR
-    %% 样式定义
-    classDef core fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef module fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef util fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    classDef ui fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+graph TB
+    classDef core fill:#2563eb,stroke:#1d4ed8,color:#fff,stroke-width:2px
+    classDef mod fill:#7c3aed,stroke:#6d28d9,color:#fff,stroke-width:2px
+    classDef util fill:#ea580c,stroke:#c2410c,color:#fff,stroke-width:2px
+    classDef ui fill:#059669,stroke:#047857,color:#fff,stroke-width:2px
 
-    %% 核心层
-    subgraph 核心层
-        M["middleware.go<br>中间件核心"]:::core
-        O["options.go<br>选项模式"]:::core
+    M["🔧 middleware.go<br/>中间件核心 · 路由分发"]:::core
+    O["⚙️ options.go<br/>选项模式"]:::core
+
+    subgraph AGG ["📦 aggregate/"]
+        AG["aggregator.go<br/>核心结构"]:::mod
+        AL["load.go<br/>规范加载"]:::mod
+        AM["merge.go<br/>合并模式"]:::mod
+        AS["selector.go<br/>选择器模式"]:::mod
+        AI["info.go<br/>聚合信息"]:::mod
+        AP["preprocess.go<br/>预处理"]:::mod
+        AX["spec.go<br/>规范骨架"]:::mod
     end
 
-    %% Aggregate 模块
-    subgraph aggregate
-        AG["aggregate/aggregator.go<br>核心结构"]:::module
-        AL["aggregate/load.go<br>规范加载"]:::module
-        AM["aggregate/merge.go<br>合并模式"]:::module
-        AS["aggregate/selector.go<br>选择器模式"]:::module
-        AI["aggregate/info.go<br>聚合信息"]:::module
-        AP["aggregate/preprocess.go<br>预处理"]:::module
-        AX["aggregate/spec.go<br>规范骨架"]:::module
+    subgraph DOC ["📄 documents/"]
+        DB["builder.go<br/>文档构建器"]:::mod
+        DP["spec.go<br/>单文档规范"]:::mod
+        DPT["paths.go<br/>路径选择"]:::mod
+        DD["definitions.go<br/>定义合并"]:::mod
+        DT["tags.go<br/>标签处理"]:::mod
     end
 
-    %% Documents 模块
-    subgraph documents
-        DB["documents/builder.go<br>文档构建器"]:::module
-        DP["documents/spec.go<br>单文档规范"]:::module
-        DPT["documents/paths.go<br>路径选择"]:::module
-        DD["documents/definitions.go<br>定义合并"]:::module
-        DT["documents/tags.go<br>标签处理"]:::module
+    subgraph LOAD ["🔌 loader/"]
+        LF["file.go<br/>文件加载"]:::util
+        LU["url.go<br/>URL 加载"]:::util
     end
 
-    %% 工具模块
-    subgraph 工具模块
-        subgraph constants
-            CH["constants/swagger.go<br>Swagger常量"]:::util
-            CC["constants/http.go<br>HTTP常量"]:::util
-            CP["constants/path.go<br>路径常量"]:::util
-            CR["constants/render.go<br>渲染常量"]:::util
-        end
-        subgraph loader
-            LF["loader/file.go<br>文件加载"]:::util
-            LU["loader/url.go<br>URL加载"]:::util
-        end
-        subgraph format
-            FJ["format/json.go<br>JSON序列化"]:::util
-        end
-        subgraph errors
-            EC["errors/code.go<br>错误码"]:::util
-            EB["errors/base.go<br>错误注册"]:::util
-        end
+    subgraph CONST ["🏷️ constants/"]
+        CS["swagger.go"]:::util
+        CH["http.go"]:::util
+        CP["path.go"]:::util
+        CR["render.go"]:::util
     end
 
-    %% UI 层
-    subgraph UI层
-        U["ui.go<br>Swagger UI渲染"]:::ui
-        SU["services_ui.go<br>服务列表UI"]:::ui
-        DU["documents_ui.go<br>文档列表UI"]:::ui
-        SV["services.go<br>服务API"]:::ui
+    subgraph ERR ["⚠️ errors/"]
+        EC["code.go<br/>错误码"]:::util
+        EB["base.go<br/>错误注册"]:::util
     end
 
-    %% Watcher
-    subgraph Watcher
-        W["watcher.go<br>文件监听器"]:::util
+    subgraph FMT ["📋 format/"]
+        FJ["json.go<br/>JSON 序列化"]:::util
     end
 
-    %% 连接关系
-    M --> AG
-    M --> DB
-    M --> U
+    subgraph UIL ["🎨 UI 层"]
+        U["ui.go<br/>Swagger UI 渲染"]:::ui
+        SU["services_ui.go<br/>服务列表 UI"]:::ui
+        DU["documents_ui.go<br/>文档列表 UI"]:::ui
+        SV["services.go<br/>服务 API"]:::ui
+    end
+
+    W["👁️ watcher.go<br/>文件监听器"]:::util
+
+    M --> AGG
+    M --> DOC
+    M --> UIL
     M --> W
+    M --- O
 
-    AG --> AL
+    AG --> AL --> LOAD
     AG --> AM
     AG --> AS
     AG --> AI
     AG --> AP
     AG --> AX
 
-    AL --> LF
-    AL --> LU
-    AL --> FJ
+    AL --> FMT
 
     DB --> DP
     DB --> DPT
