@@ -11,6 +11,11 @@
 
 package constants
 
+import (
+	"net/http"
+	"strings"
+)
+
 // ==================== HTTP 头与 CORS ====================
 
 const (
@@ -41,3 +46,36 @@ const (
 	FileExtYML  = ".yml"
 	FileExtJSON = ".json"
 )
+
+// ==================== HTTP 方法标准化 ====================
+
+// ValidHTTPMethods Swagger 规范中合法的 HTTP 操作方法（大写）
+var ValidHTTPMethods = []string{
+	http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete,
+	http.MethodOptions, http.MethodHead, http.MethodPatch,
+	http.MethodTrace, http.MethodConnect,
+}
+
+// validHTTPMethodSet 内部快速查找集合
+var validHTTPMethodSet = func() map[string]struct{} {
+	m := make(map[string]struct{}, len(ValidHTTPMethods))
+	for _, v := range ValidHTTPMethods {
+		m[v] = struct{}{}
+	}
+	return m
+}()
+
+// NormalizeHTTPMethod 将 HTTP 方法名标准化为大写，不合法时返回空字符串
+func NormalizeHTTPMethod(method string) string {
+	upper := strings.ToUpper(method)
+	if _, ok := validHTTPMethodSet[upper]; ok {
+		return upper
+	}
+	return ""
+}
+
+// IsValidHTTPMethod 判断是否是合法的 Swagger 操作方法
+func IsValidHTTPMethod(method string) bool {
+	_, ok := validHTTPMethodSet[strings.ToUpper(method)]
+	return ok
+}

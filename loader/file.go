@@ -61,6 +61,36 @@ func LoadSpecFromFile(filePath string) (map[string]interface{}, error) {
 	return spec, nil
 }
 
+// LoadSpecFromBytes 从字节流加载 Swagger 规范，根据文件名扩展名自动检测 JSON/YAML 格式
+// 当扩展名无法识别时，依次尝试 JSON 和 YAML 反序列化
+func LoadSpecFromBytes(filename string, data []byte) (map[string]interface{}, error) {
+	if len(data) == 0 {
+		return nil, errorx.NewError(serrors.ErrTypeLoaderReadFailed, filename)
+	}
+
+	var spec map[string]interface{}
+	ext := strings.ToLower(filepath.Ext(filename))
+
+	switch ext {
+	case constants.FileExtYAML, constants.FileExtYML:
+		if err := yaml.Unmarshal(data, &spec); err != nil {
+			return nil, errorx.NewError(serrors.ErrTypeLoaderParseFailed, filename)
+		}
+	case constants.FileExtJSON:
+		if err := json.Unmarshal(data, &spec); err != nil {
+			return nil, errorx.NewError(serrors.ErrTypeLoaderParseFailed, filename)
+		}
+	default:
+		if err := json.Unmarshal(data, &spec); err != nil {
+			if yamlErr := yaml.Unmarshal(data, &spec); yamlErr != nil {
+				return nil, errorx.NewError(serrors.ErrTypeLoaderParseFailed, filename)
+			}
+		}
+	}
+
+	return spec, nil
+}
+
 // LoadSpecFromPath 从指定路径加载规范文件，根据扩展名自动检测格式
 // 与 LoadSpecFromFile 不同，此方法支持无扩展名时的自动检测回退
 func LoadSpecFromPath(path string) (map[string]interface{}, error) {
