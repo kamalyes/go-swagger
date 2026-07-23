@@ -4,15 +4,14 @@ go 1.25.0
 
 require (
 	github.com/fsnotify/fsnotify v1.9.0
-	github.com/kamalyes/go-config v0.21.4
-	github.com/kamalyes/go-logger v0.5.3
-	github.com/kamalyes/go-toolbox v0.15.3
+	github.com/kamalyes/go-config v0.21.5
+	github.com/kamalyes/go-logger v0.5.4
+	github.com/kamalyes/go-toolbox v0.15.4
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	github.com/kamalyes/go-argus v0.2.1 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
+	github.com/kamalyes/go-argus v0.2.3 // indirect
 	golang.org/x/sys v0.43.0 // indirect
 	google.golang.org/grpc v1.80.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
