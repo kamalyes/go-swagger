@@ -4,9 +4,9 @@ go 1.25.0
 
 require (
 	github.com/fsnotify/fsnotify v1.9.0
-	github.com/kamalyes/go-config v0.21.9
+	github.com/kamalyes/go-config v0.21.10
 	github.com/kamalyes/go-logger v0.5.6
-	github.com/kamalyes/go-toolbox v0.15.6
+	github.com/kamalyes/go-toolbox v0.15.7
 	gopkg.in/yaml.v3 v3.0.1
 )
 
