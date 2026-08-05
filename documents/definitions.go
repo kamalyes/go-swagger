@@ -57,6 +57,41 @@ func (b *Builder) mergeDocumentDefinitions(targetDefinitions map[string]interfac
 
 		enqueueDefinitionRefs(clonedDefinition, queued, &queue)
 	}
+
+	// 补充所有枚举类型定义，即使未被 $ref 引用
+	// 枚举定义可能仅作为内联 query 参数使用（如 enumsRefreshInterval），
+	// 不被 $ref 引用但仍需要包含在输出中供客户端生成器使用
+	for defName, definition := range sourceDefinitions {
+		if processed[defName] {
+			continue
+		}
+		clonedDefinition := mathx.ConvertMapKeysToString(definition)
+		if isEnumDefinition(clonedDefinition) {
+			if _, exists := targetDefinitions[defName]; !exists {
+				targetDefinitions[defName] = clonedDefinition
+				b.logger.Debug("补充枚举类型定义: service=%s, definition=%s", serviceName, defName)
+			}
+			processed[defName] = true
+		}
+	}
+}
+
+// isEnumDefinition 检查定义是否为枚举类型（type=string 且有非空 enum 数组）
+func isEnumDefinition(definition interface{}) bool {
+	defMap, ok := definition.(map[string]interface{})
+	if !ok {
+		return false
+	}
+	typeValue, ok := defMap["type"].(string)
+	if !ok || typeValue != "string" {
+		return false
+	}
+	enumValue, exists := defMap["enum"]
+	if !exists {
+		return false
+	}
+	enumSlice, ok := enumValue.([]interface{})
+	return ok && len(enumSlice) > 0
 }
 
 // enqueueDefinitionRefs 从对象中提取 definition 引用并入队
