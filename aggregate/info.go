@@ -38,7 +38,7 @@ func (a *Aggregator) buildAggregateInfo() map[string]interface{} {
 
 // buildContactInfo 构建联系信息，仅添加非空字段
 func (a *Aggregator) buildContactInfo() interface{} {
-	safeContact := safe.Safe(a.config.Contact)
+	safeContact := safe.New(a.config.Contact)
 	contact := make(map[string]interface{})
 
 	if name := safeContact.Field("Name").String(""); name != "" {
@@ -59,7 +59,7 @@ func (a *Aggregator) buildContactInfo() interface{} {
 
 // buildLicenseInfo 构建许可证信息，仅添加非空字段
 func (a *Aggregator) buildLicenseInfo() interface{} {
-	safeLicense := safe.Safe(a.config.License)
+	safeLicense := safe.New(a.config.License)
 	license := make(map[string]interface{})
 
 	if name := safeLicense.Field("Name").String(""); name != "" {

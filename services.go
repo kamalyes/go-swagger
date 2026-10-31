@@ -121,7 +121,7 @@ func (m *Middleware) handleServicesDebug(w http.ResponseWriter, r *http.Request)
 		})
 	}
 
-	safeAggregate := safe.Safe(m.config.Aggregate)
+	safeAggregate := safe.New(m.config.Aggregate)
 	if safeAggregate.Field("Enabled").Bool(false) {
 		servicesVal := safeAggregate.Field("Services").Value()
 		if services, ok := servicesVal.([]*goswagger.ServiceSpec); ok {
